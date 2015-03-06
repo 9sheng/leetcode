@@ -10,33 +10,33 @@ using namespace std;
 class Solution {
 public:
     string addBinary(string a, string b) {
-        string& result = a.size() > b.size() ? a : b;
-        string& tmp = a.size() > b.size() ? b : a;
+        string& first = a.size() > b.size() ? a : b;
+        string& second = a.size() > b.size() ? b : a;
 
-        int rs = result.size();
-        int ts = tmp.size();
+        int rs = first.size();
+        int ts = second.size();
 
-        bool hasCarryBit = false;
+        bool hasCarryOn = false;
 
         while (ts >= 0) {
-            if (result[rs] == '1') {
-                if (tmp[ts] == '1') {
-                    if (!hasCarryBit) {
-                        result[rs] = '0';
-                        hasCarryBit = true;
+            if (first[rs] == '1') {
+                if (second[ts] == '1') {
+                    if (!hasCarryOn) {
+                        first[rs] = '0';
+                        hasCarryOn = true;
                     }
                 } else {
-                    if (hasCarryBit) {
-                        result[rs] = '0';
+                    if (hasCarryOn) {
+                        first[rs] = '0';
                     }
                 }
             } else {
-                if (tmp[ts] == '1') {
-                    result[rs] = hasCarryBit ? '0' : '1';
+                if (second[ts] == '1') {
+                    first[rs] = hasCarryOn ? '0' : '1';
                 } else {
-                    if (hasCarryBit) {
-                        result[rs] = '1';
-                        hasCarryBit = false;
+                    if (hasCarryOn) {
+                        first[rs] = '1';
+                        hasCarryOn = false;
                     }
                 }
             }
@@ -46,22 +46,22 @@ public:
         }
 
         for (; rs >= 0; rs--) {
-            if (result[rs] == '1') {
-                if (hasCarryBit) {
-                    result[rs] = '0';
+            if (first[rs] == '1') {
+                if (hasCarryOn) {
+                    first[rs] = '0';
                 } else {
                     break;
                 }
             } else {
-                if (hasCarryBit) {
-                    result[rs] = '1';
-                    hasCarryBit = false;
+                if (hasCarryOn) {
+                    first[rs] = '1';
+                    hasCarryOn = false;
                 }
                 break;
             }
         }
 
-        return hasCarryBit ? "1" + result : result;
+        return hasCarryOn ? "1" + first : first;
     }
 };
 
