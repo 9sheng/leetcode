@@ -38,7 +38,7 @@ public:
                 if (maxLength == 128) return 128;
             }
         }
-	    
+
 	    return basePos == -1 ? size : maxLength;
     }
 };
