@@ -6,7 +6,7 @@ EXES = $(CPPS:.cpp=.exe)
 all : $(EXES)
 
 %.exe : %.o testharness.o
-	g++ -std=c++0x -g -o $@ $+ || true
+	g++ -Wall -Werror -Wno-unused -std=c++0x -g -o $@ $+ || true
 
 %.o : %.cpp
 	g++ -std=c++0x -g -c $<
