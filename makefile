@@ -1,6 +1,6 @@
 .SUFFIXES: .exe .o .cpp
 
-CC   = clang++
+CC   = g++
 CPPS = $(shell ls [1-9]*.cpp)
 EXES = $(CPPS:.cpp=.exe)
 
