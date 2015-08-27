@@ -6,8 +6,17 @@
 #include <unordered_map>
 #include <vector>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+
 using namespace std;
 
+// time out
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
@@ -24,48 +33,52 @@ public:
         for (int i = 0; i < ws; i++)
             uniq_word[words[i]] = i;
 
-        queue<int> current_matched;
+        vector<int> current_matched(s.size() / wl + 1, -1);
         unordered_map<int, int> word_left;
 
         for (int k = 0; k < wl; k++) {
-            while (!current_matched.empty())
-                current_matched.pop();
 
-            word_left.clear();
-            for (int i = 0; i < ws; ++i)
-                word_left[uniq_word[words[i]]]++;
-
+            int cm = 0;
             for (int i = k; i < end; i += wl) {
                 auto word = s.substr(i, wl);
                 auto iter = uniq_word.find(word);
+                if (iter != uniq_word.end())
+                    current_matched[cm] = (*iter).second;
+                else
+                    current_matched[cm] = -1;
+                cm++;
+            }
 
-                if (iter != uniq_word.end()) {
-                    auto id = (*iter).second;
-                    auto count_iter = word_left.find(id);
-                    if ((*count_iter).second != 0) {
-                        current_matched.push(id);
-                        (*count_iter).second--;
-                    } else {
-                        while (!current_matched.empty()) {
-                            int a = current_matched.front();
-                            current_matched.pop();
-                            if (a == id) break;
-                            word_left[a]++;
-                        }
-                        current_matched.push(id);
-                    }
+            word_left.clear();
+            for (int i = 0; i < ws; i++)
+                ++word_left[uniq_word[words[i]]];
+
+            int start = 0;
+            for (int i = 0; i < cm; i++) {
+                if (current_matched[i] == -1) {
+                    start = i + 1;
+                    word_left.clear();
+                    for (int i = 0; i < ws; i++)
+                        ++word_left[uniq_word[words[i]]];
                 } else {
-                    while (!current_matched.empty())
-                        current_matched.pop();
-                    for (int j = 0; j < ws; ++j)
-                        word_left[uniq_word[words[j]]]++;
+                    auto& count = word_left[current_matched[i]];
+                    if (count != 0) {
+                        --count;
+                    } else {
+                        while (true) {
+                            int old = start++;
+                            if (current_matched[old] == current_matched[i])
+                                break;
+                            else
+                                ++word_left[current_matched[old]];
+                        }
+                    }
                 }
 
-                if (current_matched.size() == ws) {
-                    int a = current_matched.front();
-                    word_left[a]++;
-                    current_matched.pop();
-                    result.push_back(i - (ws - 1) * wl);
+                if (i - start + 1 == ws) {
+                    result.push_back(k + start * wl);
+                    ++word_left[current_matched[start]];
+                    ++start;
                 }
             }
         }
@@ -74,7 +87,78 @@ public:
     }
 };
 
+#define handle_error(msg) \
+           do { perror(msg); exit(EXIT_FAILURE); } while (0)
+
 TEST(Solution, test) {
+    {
+        char *addr;
+        int fd;
+        struct stat sb;
+        off_t offset, pa_offset;
+        size_t length;
+        ssize_t s;
+
+        fd = open("../data.txt", O_RDONLY);
+        if (fd == -1)
+            handle_error("open");
+
+        if (fstat(fd, &sb) == -1)           /* To obtain file size */
+            handle_error("fstat");
+
+        offset = 0;
+        length = sb.st_size - offset;
+
+        addr = (char*)mmap(NULL, length, PROT_READ,
+                           MAP_PRIVATE, fd, 0);
+
+        if (addr == MAP_FAILED)
+            handle_error("mmap");
+
+        std::string ss;
+        vector<string> words;
+        char *ptr = addr;
+        char *start = NULL;
+        while (true) {
+            if (isalpha(*addr)) {
+                if (start == NULL) start = addr;
+            } else {
+                if (start != NULL) {
+                    if (addr - start != 0) {
+                        ss = string(start, addr - start);
+                        break;
+                    }
+                    start = NULL;
+                }
+            }
+            addr++;
+        }
+
+        start = NULL;
+        while (true) {
+            if (isalpha(*addr)) {
+                if (start == NULL) start = addr;
+            } else {
+                if (start != NULL) {
+                    if (addr - start != 0)
+                        words.push_back(string(start, addr - start));
+                    start = NULL;
+                }
+            }
+            if (*addr == ']') break;
+            addr++;
+        }
+
+        std::cout << "ss.len = " << ss.size() << std::endl;
+        std::cout << "words.size = " << words.size() << std::endl;
+        vector<int> result = findSubstring(ss, words);
+
+        for (int i = 0; i < result.size(); i++)
+            std::cout << "res: " << result[i] << std::endl;
+
+           exit(0);
+    }
+
     {
         std::string s = "barfoothefoobarman";
         vector<string> words({"foo", "bar"});
