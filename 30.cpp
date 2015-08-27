@@ -16,7 +16,6 @@
 
 using namespace std;
 
-// time out
 class Solution {
 public:
     vector<int> findSubstring(string s, vector<string>& words) {
@@ -56,10 +55,10 @@ public:
             int start = 0;
             for (int i = 0; i < cm; i++) {
                 if (current_matched[i] == -1) {
+                    for (int j = start; j < i; j++)
+                        ++word_left[current_matched[j]];
                     start = i + 1;
-                    word_left.clear();
-                    for (int i = 0; i < ws; i++)
-                        ++word_left[uniq_word[words[i]]];
+                    continue;
                 } else {
                     auto& count = word_left[current_matched[i]];
                     if (count != 0) {
@@ -87,7 +86,7 @@ public:
     }
 };
 
-#define handle_error(msg) \
+#define handle_error(msg)                                       \
            do { perror(msg); exit(EXIT_FAILURE); } while (0)
 
 TEST(Solution, test) {
