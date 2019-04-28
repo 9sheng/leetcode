@@ -1,15 +1,17 @@
 .SUFFIXES: .exe .o .cpp
 
 CC   = g++
-CPPS = $(shell ls [1-9]*.cpp)
+CPPS = $(shell ls *[0-9]*.cpp)
 EXES = $(CPPS:.cpp=.exe)
+OBJS = $(CPPS:.cpp=.o)
 
-all : $(EXES)
+.PHONY: all
+all: $(EXES) $(OBJS) 
 
-%.exe : %.o testharness.o
+%.exe: %.o testharness.o
 	$(CC) -Wall -Werror -Wno-unused -std=c++0x -g -o $@ $+ || true
 
-%.o : %.cpp
+%.o: %.cpp
 	$(CC) -std=c++0x -g -c $<
 
 clean:
