@@ -32,7 +32,7 @@ private:
             i = strLen; // we want to break while loop
             for (size_t j = base + 1; j <= strLen; j++) {
                 if (str[j] != c) {
-                    ptr += sprintf(ptr ,"%d%c", j - base, c);
+                    ptr += sprintf(ptr ,"%ld%c", j - base, c);
                     i = j; // continue loop
                     break;
                 }

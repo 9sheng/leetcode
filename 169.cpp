@@ -15,7 +15,7 @@ public:
                 return num[i];
             }
         }
-
+        return 0;
     }
 };
 

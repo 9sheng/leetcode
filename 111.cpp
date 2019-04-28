@@ -39,6 +39,8 @@ public:
             if (ps.node->right != NULL)
                 q.push({ps.node->right, ps.level + 1});
         }
+
+        return 0;
     }
 };
 
