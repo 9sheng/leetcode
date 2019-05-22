@@ -56,6 +56,6 @@ public:
 TEST(Solution, test) {
     ASSERT_EQ(5 / 2, divide(5, 2));
     ASSERT_EQ(2147483647 / 2, divide(2147483647, 2));
-    ASSERT_EQ(-2147483648 / 2, divide(2147483648, 2));
+    ASSERT_EQ(-2147483648 / 2, divide((int)2147483648, 2));
 }
 

@@ -5,12 +5,12 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <sstream>
-
-// Returns 0 if all tests pass.
-// Dies or returns a non-zero value if some test fails.
-extern int RunAllTests();
-
+#include <string>
+#include <vector>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 // An instance of Tester is allocated to hold temporary state during
 // the execution of an assertion.
@@ -92,9 +92,57 @@ public:void _Run();                                                      \
             ::RegisterTest(#base, #name, &TCONCAT(_Test_,name)::_RunIt); \
     void TCONCAT(_Test_,name)::_Run()
 
+namespace {
+struct Test {
+    const char* base;
+    const char* name;
+    void (*func)();
+};
+std::vector<Test>* tests;
+}
+
 // Register the specified test.  Typically not used directly, but
 // invoked via the macro expansion of TEST.
-extern bool RegisterTest(const char* base, const char* name, void (*func)());
+bool RegisterTest(const char* base, const char* name, void (*func)()) {
+    if (tests == NULL) {
+        tests = new std::vector<Test>;
+    }
+    Test t;
+    t.base = base;
+    t.name = name;
+    t.func = func;
+    tests->push_back(t);
+    return true;
+}
+
+// Returns 0 if all tests pass.
+// Dies or returns a non-zero value if some test fails.
+int RunAllTests() {
+    const char* matcher = getenv("LEVELDB_TESTS");
+
+    int num = 0;
+    if (tests != NULL) {
+        for (size_t i = 0; i < tests->size(); i++) {
+            const Test& t = (*tests)[i];
+            if (matcher != NULL) {
+                std::string name = t.base;
+                name.push_back('.');
+                name.append(t.name);
+                if (strstr(name.c_str(), matcher) == NULL) {
+                    continue;
+                }
+            }
+            fprintf(stderr, "==== Test %s.%s\n", t.base, t.name);
+            (*t.func)();
+            ++num;
+        }
+    }
+    fprintf(stderr, "==== PASSED %d tests\n", num);
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    return ::RunAllTests();
+}
 
 #endif  // TESTHARNESS_H_
-
