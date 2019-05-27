@@ -92,5 +92,5 @@ TEST(Solution, test) {
   ASSERT_EQ(05, numTilings(3));
   ASSERT_EQ(11, numTilings(4));
   ASSERT_EQ(24, numTilings(5));
-  ASSERT_EQ(24, numTilings(1000));
+  ASSERT_EQ(979232805, numTilings(1000));
 }
