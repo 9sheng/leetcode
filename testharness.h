@@ -145,4 +145,24 @@ int main(int argc, char** argv) {
   return ::RunAllTests();
 }
 
+#include <algorithm>
+#include <cassert>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <deque>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+using namespace std;
+
 #endif  // TESTHARNESS_H_
