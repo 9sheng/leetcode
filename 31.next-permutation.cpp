@@ -28,6 +28,9 @@ class Solution {
     int ti = -1;
     int tj = -1;
     int v = -1;
+    // From right to left, i.e., for i = nums.size() .. 1,
+    // find largest nums[j] such that j > i and nums[i] > nums[j].
+    // If we find nums[j], we swap nums[i] and num[j], and sort nums[j:]
     for (int i = nums.size() - 1; i >= 0; i--) {
       for (int j = i + 1; j < nums.size(); j++) {
         if (nums[i] < nums[j] && (v == -1 || v > nums[j])) {
@@ -36,7 +39,6 @@ class Solution {
           v = nums[j];
         }
       }
-
       if (ti != -1) {
         int tmp = nums[ti];
         nums[ti] = nums[tj];

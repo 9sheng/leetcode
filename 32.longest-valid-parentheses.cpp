@@ -20,6 +20,8 @@ class Solution {
  public:
   int longestValidParentheses(string s) {
     stack<int> open_pos;
+    // far_open_pos[i] record farest open parenthes such than
+    // substr betweent far_open_pos[i] and i is a valid parenthes string.
     vector<int> far_open_pos(s.size(), -1);
 
     int max = 0;
